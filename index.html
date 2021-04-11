@@ -16,7 +16,17 @@
 <div class="container-fluid mt-3" id="app">
     <input type="text" class="form-control" v-model="criterioDeBusqueda"
         placeholder="Ingresar un criterio de busqueda...">
-    <br>
+    <br/>
+    <input type="text" class="form-control" v-model="busquedaNyA"
+        placeholder="Busqueda por Nombre o Apellido">
+    <br/>
+    <input type="text" class="form-control" v-model="busquedaDNI"
+        placeholder="Busqueda por DNI">
+    <br/>
+    <div class="alert alert-warning" role="alert" v-if="noCumpleLargoMinimo">
+        Por favor ingrese por lo menos 3 caracteres
+    </div>
+
     <div class="card-deck m-0">
         <div class="row">
             <div class="col" v-for="persona in personasFiltradas">
@@ -40,6 +50,8 @@
         el: '#app',
         data: {
             criterioDeBusqueda: '',
+            busquedaNyA:'',
+            busquedaDNI:'',
             //Aquí, en este array es donde tienen que agregar su información
             personas: [
                 {
@@ -334,10 +346,26 @@
         },
         computed: {
             personasFiltradas() {
-                return this.personas.filter((persona) => {
-                    let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
-                    return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
-                });
+                if (this.criterioDeBusqueda) {
+                    return this.personas.filter((persona) => {
+                        let registroCompleto = `${persona.nombre} ${persona.apellido} ${persona.dni} ${persona.correo}`
+                        return registroCompleto.toLowerCase().includes(this.criterioDeBusqueda.toLowerCase())
+                    });
+                }
+                if (this.busquedaNyA) {
+                    return this.personas.filter((persona) => {
+                        let registroCompleto = `${persona.nombre} ${persona.apellido}`
+                        return registroCompleto.toLowerCase().includes(this.busquedaNyA.toLowerCase())
+                    });
+                }
+                if (this.busquedaDNI) {
+                    return this.personas.filter((persona) => {
+                        return persona.dni.includes(this.busquedaDNI)
+                    });
+                }
+            },
+            noCumpleLargoMinimo() {
+                return (this.criterioDeBusqueda.length+this.busquedaNyA.length+this.busquedaDNI.length) < 3
             }
         },
         methods: {
